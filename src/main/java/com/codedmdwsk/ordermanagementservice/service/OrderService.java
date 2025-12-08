@@ -16,6 +16,5 @@ public interface OrderService {
     PagedResponse<OrderListDto> listOrders(OrderListRequestDto request);
     void writeReportToCsv(OrderListRequestDto request, Writer writer);
     UploadResponseDto upload(MultipartFile file);
-    List<CustomerResponseDto> getAllCustomers();
 
 }

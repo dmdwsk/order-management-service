@@ -9,10 +9,10 @@ import lombok.Getter;
 public class CustomerResponseDto {
     private Long id;
     private String customerName;
-    public static CustomerResponseDto from(Customer customer){
-        return CustomerResponseDto.builder()
-                .id(customer.getId())
-                .customerName(customer.getCustomerName())
-                .build();
+    public static CustomerResponseDto from(Customer entity) {
+        return new CustomerResponseDto(
+                entity.getId(),
+                entity.getCustomerName()
+        );
     }
 }

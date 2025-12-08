@@ -204,11 +204,4 @@ public class OrderServiceImpl implements OrderService{
                 .build();
     }
 
-    @Override
-    public List<CustomerResponseDto> getAllCustomers() {
-        return customerRepository.
-                findAll().stream().
-                map(CustomerResponseDto::from)
-                .toList();
-    }
 }

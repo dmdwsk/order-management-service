@@ -1,6 +1,7 @@
 package com.codedmdwsk.ordermanagementservice.controller;
 
 import com.codedmdwsk.ordermanagementservice.dto.*;
+import com.codedmdwsk.ordermanagementservice.service.CustomerService;
 import com.codedmdwsk.ordermanagementservice.service.OrderService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -18,6 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final CustomerService customerService;
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderResponseDto createOrder(@Valid @RequestBody OrderCreateDto dto) {
@@ -60,10 +63,6 @@ public class OrderController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOrder(@PathVariable Long id) {
         orderService.deleteOrder(id);
-    }
-    @GetMapping("/customers")
-    public List<CustomerResponseDto> getAllCustomers() {
-        return orderService.getAllCustomers();
     }
 
 
