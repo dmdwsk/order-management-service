@@ -7,13 +7,21 @@ import com.codedmdwsk.ordermanagementservice.exceptions.NotFoundException;
 import com.codedmdwsk.ordermanagementservice.repository.CustomerRepository;
 import com.codedmdwsk.ordermanagementservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.BeanRegistry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.codedmdwsk.ordermanagementservice.service.OrderSpecifications.byCustomerId;
 import static com.codedmdwsk.ordermanagementservice.service.OrderSpecifications.byProduct;
@@ -23,6 +31,7 @@ import static com.codedmdwsk.ordermanagementservice.service.OrderSpecifications.
 public class OrderServiceImpl implements OrderService{
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
+    private final ObjectMapper objectMapper;
 
     private void validateOrder(
             Long customerId,
@@ -132,5 +141,74 @@ public class OrderServiceImpl implements OrderService{
                         .toList(),
                 page.getTotalPages()
         );
+    }
+
+    @Override
+    public void writeReportToCsv(OrderListRequestDto request, Writer writer) {
+        var spec = Specification.where(byCustomerId(request.getCustomerId())).and(byProduct(request.getProducts()));
+        List<OrderData> all = orderRepository.findAll(spec);
+        try(writer){
+            writer.write("ID;Date;TotalPrice;Products;CustomerName\n");
+            for (OrderData o : all) {
+                writer.write(
+                        o.getId() + ";" +
+                                o.getDate() + ";" +
+                                o.getTotalPrice() + ";" +
+                                o.getProducts() + ";" +
+                                o.getCustomer().getCustomerName() +
+                                "\n"
+                );
+            }
+        }catch (IOException e){
+            throw new RuntimeException("CSV writing error", e);
+        }
+    }
+
+    @Override
+    public UploadResponseDto upload(MultipartFile file) {
+        int success = 0;
+        int failure = 0;
+        try {
+            List<OrderCreateDto> items = objectMapper.readValue(
+                    file.getBytes(),
+                    new TypeReference<List<OrderCreateDto>>() {}
+            );
+            for(OrderCreateDto dto: items){
+                try{
+                    validateOrder(
+                            dto.getCustomerId(),
+                            dto.getDate(),
+                            dto.getTotalPrice(),
+                            dto.getProducts()
+                    );
+                    Customer customer = customerRepository.findById(dto.getCustomerId())
+                            .orElseThrow(() -> new NotFoundException("Customer not found"));
+                    OrderData entity = new OrderData();
+                    entity.setCustomer(customer);
+                    entity.setDate(dto.getDate());
+                    entity.setTotalPrice(dto.getTotalPrice());
+                    entity.setProducts(dto.getProducts());
+
+                    orderRepository.save(entity);
+                    success++;
+                }catch (Exception ex){
+                    failure++;
+                }
+            }
+        }catch (IOException e){
+            throw new RuntimeException("Invalid JSON file format");
+        }
+        return UploadResponseDto.builder()
+                .successCount(success)
+                .failureCount(failure)
+                .build();
+    }
+
+    @Override
+    public List<CustomerResponseDto> getAllCustomers() {
+        return customerRepository.
+                findAll().stream().
+                map(CustomerResponseDto::from)
+                .toList();
     }
 }
