@@ -2,17 +2,22 @@ package com.codedmdwsk.ordermanagementservice.service;
 
 import com.codedmdwsk.ordermanagementservice.data.Customer;
 import com.codedmdwsk.ordermanagementservice.data.OrderData;
-import com.codedmdwsk.ordermanagementservice.dto.OrderCreateDto;
-import com.codedmdwsk.ordermanagementservice.dto.OrderResponseDto;
-import com.codedmdwsk.ordermanagementservice.dto.OrderUpdateDto;
+import com.codedmdwsk.ordermanagementservice.dto.*;
 import com.codedmdwsk.ordermanagementservice.exceptions.NotFoundException;
 import com.codedmdwsk.ordermanagementservice.repository.CustomerRepository;
 import com.codedmdwsk.ordermanagementservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import static com.codedmdwsk.ordermanagementservice.service.OrderSpecifications.byCustomerId;
+import static com.codedmdwsk.ordermanagementservice.service.OrderSpecifications.byProduct;
+
 @RequiredArgsConstructor
 @Service
 public class OrderServiceImpl implements OrderService{
@@ -107,4 +112,25 @@ public class OrderServiceImpl implements OrderService{
         orderRepository.delete(order);
     }
 
+    @Override
+    public PagedResponse<OrderListDto> listOrders(OrderListRequestDto request) {
+
+        Pageable pageable = PageRequest.of(
+                request.getPage() - 1,
+                request.getSize()
+        );
+
+        var spec = Specification.where(byCustomerId(request.getCustomerId()))
+                .and(byProduct(request.getProducts()));
+
+        var page = orderRepository.findAll(spec, pageable);
+
+
+        return PagedResponse.of(
+                page.getContent().stream()
+                        .map(OrderListDto::from)
+                        .toList(),
+                page.getTotalPages()
+        );
+    }
 }

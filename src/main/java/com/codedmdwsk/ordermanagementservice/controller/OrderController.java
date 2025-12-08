@@ -1,8 +1,6 @@
 package com.codedmdwsk.ordermanagementservice.controller;
 
-import com.codedmdwsk.ordermanagementservice.dto.OrderCreateDto;
-import com.codedmdwsk.ordermanagementservice.dto.OrderResponseDto;
-import com.codedmdwsk.ordermanagementservice.dto.OrderUpdateDto;
+import com.codedmdwsk.ordermanagementservice.dto.*;
 import com.codedmdwsk.ordermanagementservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,11 @@ public class OrderController {
     public OrderResponseDto createOrder(@Valid @RequestBody OrderCreateDto dto) {
         return orderService.createOrder(dto);
     }
+    @PostMapping("/list")
+    public PagedResponse<OrderListDto> listOrders(@RequestBody OrderListRequestDto request){
+        return orderService.listOrders(request);
+    }
+
 
     @GetMapping("/{id}")
     public OrderResponseDto getOrder(@PathVariable Long id) {
@@ -31,4 +34,11 @@ public class OrderController {
             @Valid @RequestBody OrderUpdateDto dto) {
         return orderService.updateOrder(id, dto);
     }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteOrder(@PathVariable Long id) {
+        orderService.deleteOrder(id);
+    }
+
+
 }

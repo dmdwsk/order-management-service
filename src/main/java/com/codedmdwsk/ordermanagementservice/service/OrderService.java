@@ -1,8 +1,6 @@
 package com.codedmdwsk.ordermanagementservice.service;
 
-import com.codedmdwsk.ordermanagementservice.dto.OrderCreateDto;
-import com.codedmdwsk.ordermanagementservice.dto.OrderResponseDto;
-import com.codedmdwsk.ordermanagementservice.dto.OrderUpdateDto;
+import com.codedmdwsk.ordermanagementservice.dto.*;
 
 public interface OrderService {
     OrderResponseDto createOrder(OrderCreateDto dto);
@@ -11,5 +9,6 @@ public interface OrderService {
 
     OrderResponseDto updateOrder(Long id, OrderUpdateDto dto);
     void deleteOrder(Long id);
+    PagedResponse<OrderListDto> listOrders(OrderListRequestDto request);
 
 }
