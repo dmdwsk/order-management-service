@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Getter
 @Builder
 @Jacksonized
-public class OrderUpdateDto extends OrderCreateDto{
+public class OrderUpdateDto  {
     @NotNull
     @Positive
     private Long customerId;

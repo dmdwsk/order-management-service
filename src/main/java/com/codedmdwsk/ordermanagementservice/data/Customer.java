@@ -1,10 +1,14 @@
 package com.codedmdwsk.ordermanagementservice.data;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "customers", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "name")
+        @UniqueConstraint(columnNames = "CUSTOMER_NAME")
 })
 public class Customer {
     @Id
