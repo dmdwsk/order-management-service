@@ -9,12 +9,13 @@ import com.codedmdwsk.ordermanagementservice.exceptions.DuplicateCustomerExcepti
 import com.codedmdwsk.ordermanagementservice.exceptions.NotFoundException;
 import com.codedmdwsk.ordermanagementservice.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
 @RequiredArgsConstructor
-public class CustomerServiceImpl implements CustomerService{
+public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
 
     @Override
@@ -44,7 +45,7 @@ public class CustomerServiceImpl implements CustomerService{
     @Override
     public CustomerResponseDto update(Long id, CustomerUpdateDto dto) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(()->new NotFoundException("Customer not found"));
+                .orElseThrow(() -> new NotFoundException("Customer not found"));
         String newName = dto.getCustomerName().trim();
         boolean nameExists = customerRepository
                 .existsByCustomerNameIgnoreCaseAndIdNot(newName, id);
@@ -64,8 +65,11 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     public void deleteCustomer(Long id) {
-        Customer customer = customerRepository.findById(id).orElseThrow(()
-                -> new NotFoundException("Customer not found"));
-        customerRepository.delete(customer);
+        try {
+            customerRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalStateException("Cannot delete customer with existing orders");
+        }
     }
 }
+

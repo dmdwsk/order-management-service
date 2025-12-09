@@ -3,12 +3,14 @@ package com.codedmdwsk.ordermanagementservice.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 public class PagedResponse<T> {
     private List<T> list;
     private int totalPages;

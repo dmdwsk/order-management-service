@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-orders
+      author: dmdwsk
+      changes:
+        - insert:
+            tableName: orders
+            columns:
+              - column: { name: customer_id, valueNumeric: 1 }
+              - column: { name: date, valueDate: "2025-01-10" }
+              - column: { name: total_price, valueNumeric: 120.50 }
+              - column: { name: products, value: "Milk, Bread, Honey" }
+
+        - insert:
+            tableName: orders
+            columns:
+              - column: { name: customer_id, valueNumeric: 2 }
+              - column: { name: date, valueDate: "2025-01-11" }
+              - column: { name: total_price, valueNumeric: 240.00 }
+              - column: { name: products, value: "Coffee, Tea" }
+
+        - insert:
+            tableName: orders
+            columns:
+              - column: { name: customer_id, valueNumeric: 3 }
+              - column: { name: date, valueDate: "2025-01-12" }
+              - column: { name: total_price, valueNumeric: 99.99 }
+              - column: { name: products, value: "Chocolate" }
+
+        - insert:
+            tableName: orders
+            columns:
+              - column: { name: customer_id, valueNumeric: 4 }
+              - column: { name: date, valueDate: "2025-01-15" }
+              - column: { name: total_price, valueNumeric: 500.00 }
+              - column: { name: products, value: "Laptop Bag" }
+
+        - insert:
+            tableName: orders
+            columns:
+              - column: { name: customer_id, valueNumeric: 5 }
+              - column: { name: date, valueDate: "2025-01-17" }
+              - column: { name: total_price, valueNumeric: 15.75 }
+              - column: { name: products, value: "Notebook, Pen" }

@@ -19,14 +19,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
-    private final CustomerService customerService;
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderResponseDto createOrder(@Valid @RequestBody OrderCreateDto dto) {
         return orderService.createOrder(dto);
     }
-    @PostMapping("/list")
+    @PostMapping("/_list")
     public PagedResponse<OrderListDto> listOrders(@RequestBody OrderListRequestDto request){
         return orderService.listOrders(request);
     }

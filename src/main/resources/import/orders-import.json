@@ -1,0 +1,33 @@
+[
+  {
+    "customerId": 1,
+    "date": "2025-01-10",
+    "totalPrice": 120.50,
+    "products": "Milk, Bread, Honey"
+  },
+  {
+    "customerId": 2,
+    "date": "2025-01-11",
+    "totalPrice": 240.00,
+    "products": "Coffee, Tea"
+  },
+  {
+    "customerId": 3,
+    "date": "2025-01-12",
+    "totalPrice": 99.99,
+    "products": "Chocolate"
+  },
+  {
+    "customerId": 4,
+    "date": "2025-01-15",
+    "totalPrice": 500.00,
+    "products": "Laptop Bag"
+  },
+  {
+    "customerId": 5,
+    "date": "2025-01-17",
+    "totalPrice": 15.75,
+    "products": "Notebook, Pen"
+  }
+]
+

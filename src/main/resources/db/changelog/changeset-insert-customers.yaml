@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-customers
+      author: dmdwsk
+      changes:
+        - insert:
+            tableName: customers
+            columns:
+              - column:
+                  name: CUSTOMER_NAME
+                  value: "Artem"
+        - insert:
+            tableName: customers
+            columns:
+              - column:
+                  name: CUSTOMER_NAME
+                  value: "Olena"
+        - insert:
+            tableName: customers
+            columns:
+              - column:
+                  name: CUSTOMER_NAME
+                  value: "Maksym"
+        - insert:
+            tableName: customers
+            columns:
+              - column:
+                  name: CUSTOMER_NAME
+                  value: "Ivan"
+        - insert:
+            tableName: customers
+            columns:
+              - column:
+                  name: CUSTOMER_NAME
+                  value: "Sofia"
+        - insert:
+            tableName: customers
+            columns:
+              - column:
+                  name: CUSTOMER_NAME
+                  value: "Andrii"

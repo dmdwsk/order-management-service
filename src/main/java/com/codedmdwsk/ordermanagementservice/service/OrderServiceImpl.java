@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
+
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
@@ -125,15 +126,21 @@ public class OrderServiceImpl implements OrderService{
     public PagedResponse<OrderListDto> listOrders(OrderListRequestDto request) {
 
         Pageable pageable = PageRequest.of(
-                request.getPage() - 1,
+                request.getPage(),
                 request.getSize()
         );
 
-        var spec = Specification.where(byCustomerId(request.getCustomerId()))
-                .and(byProduct(request.getProducts()));
+        Specification<OrderData> spec = (root, query, cb) -> cb.conjunction();
+
+        if (request.getCustomerId() != null) {
+            spec = spec.and(byCustomerId(request.getCustomerId()));
+        }
+
+        if (request.getProducts() != null && !request.getProducts().isBlank()) {
+            spec = spec.and(byProduct(request.getProducts()));
+        }
 
         var page = orderRepository.findAll(spec, pageable);
-
 
         return PagedResponse.of(
                 page.getContent().stream()
@@ -141,6 +148,7 @@ public class OrderServiceImpl implements OrderService{
                         .toList(),
                 page.getTotalPages()
         );
+
     }
 
     @Override

@@ -7,6 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+
 public class CustomerCreateDto {
     @NotBlank(message = "Customer name cannot be empty")
     @Size(max = 50, message = "Customer name cannot exceed 50 characters")
