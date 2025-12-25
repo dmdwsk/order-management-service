@@ -35,3 +35,6 @@ build/
 .vscode/
 /data/*
 /.claude/
+
+.DS_Store
+**/.DS_Store

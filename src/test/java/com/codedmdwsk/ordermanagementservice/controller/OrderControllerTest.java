@@ -8,7 +8,13 @@ import com.codedmdwsk.ordermanagementservice.dto.OrderUpdateDto;
 import com.codedmdwsk.ordermanagementservice.repository.CustomerRepository;
 import com.codedmdwsk.ordermanagementservice.repository.OrderRepository;
 
+import jakarta.persistence.EntityManagerFactory;
+import net.ttddyy.dsproxy.QueryCount;
+import net.ttddyy.dsproxy.QueryCountHolder;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +60,48 @@ class OrderControllerTest {
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        QueryCountHolder.clear();
+    }
+    @Autowired
+    EntityManagerFactory emf;
+
+    @Test
+    void listOrders_shouldNotTriggerNPlusOne_usingHibernateStats() throws Exception {
+        SessionFactory sf = emf.unwrap(SessionFactory.class);
+        Statistics stats = sf.getStatistics();
+        stats.clear();
+
+        for (int i = 0; i < 10; i++) {
+            Customer c = createCustomer("C" + i);
+            OrderData o = new OrderData();
+            o.setCustomer(c);
+            o.setDate(LocalDate.now());
+            o.setTotalPrice(BigDecimal.ONE);
+            o.setProducts("A");
+            orderRepository.save(o);
+        }
+
+        OrderListRequestDto request = new OrderListRequestDto();
+        request.setPage(0);
+        request.setSize(20);
+        stats.clear();
+
+
+        mockMvc.perform(post("/api/orders/_list")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.list", hasSize(10)));
+
+
+        long entityLoads = stats.getEntityLoadCount();
+        System.out.println("ENTITY LOADS = " + entityLoads);
+        long statements = stats.getPrepareStatementCount();
+        System.out.println("STATEMENTS = " + statements);
+
+
+        Assertions.assertTrue(statements <= 3,
+                "Too many SQL statements: " + statements + " (possible N+1)");
     }
 
     @AfterEach
