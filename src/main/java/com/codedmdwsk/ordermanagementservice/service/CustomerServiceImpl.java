@@ -5,12 +5,14 @@ import com.codedmdwsk.ordermanagementservice.data.OrderData;
 import com.codedmdwsk.ordermanagementservice.dto.CustomerCreateDto;
 import com.codedmdwsk.ordermanagementservice.dto.CustomerResponseDto;
 import com.codedmdwsk.ordermanagementservice.dto.CustomerUpdateDto;
+import com.codedmdwsk.ordermanagementservice.exceptions.CustomerDeletionNotAllowedException;
 import com.codedmdwsk.ordermanagementservice.exceptions.DuplicateCustomerException;
 import com.codedmdwsk.ordermanagementservice.exceptions.NotFoundException;
 import com.codedmdwsk.ordermanagementservice.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
@@ -41,7 +43,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         return CustomerResponseDto.from(entity);
     }
-
+    @Transactional
     @Override
     public CustomerResponseDto update(Long id, CustomerUpdateDto dto) {
         Customer customer = customerRepository.findById(id)
@@ -68,8 +70,9 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             customerRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalStateException("Cannot delete customer with existing orders");
+            throw new CustomerDeletionNotAllowedException("Cannot delete customer with existing orders");
         }
     }
+
 }
 

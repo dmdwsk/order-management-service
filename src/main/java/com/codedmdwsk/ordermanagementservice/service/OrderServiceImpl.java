@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -88,10 +89,10 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public OrderResponseDto getOrderById(Long id) {
         OrderData order = orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() -> new NotFoundException("Order not found"));
         return OrderResponseDto.from(order);
     }
-
+    @Transactional
     @Override
     public OrderResponseDto updateOrder(Long id, OrderUpdateDto dto) {
         validateOrder(

@@ -39,9 +39,5 @@ public class CustomerController {
     public void deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
     }
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<?> handleIllegalState(IllegalStateException ex) {
-        return ResponseEntity.status(409).body(ex.getMessage());
-    }
 
 }
