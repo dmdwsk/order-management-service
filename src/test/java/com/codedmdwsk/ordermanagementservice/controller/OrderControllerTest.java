@@ -152,6 +152,11 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.id").value(order.getId()))
                 .andExpect(jsonPath("$.products").value("X,Y,Z"));
     }
+    @Test
+    void getOrder_shouldReturn404_WhenOrderNotFound() throws Exception{
+        long missingId = 999_999L;
+        mockMvc.perform(get("/api/orders/" + missingId)).andExpect(status().isNotFound());
+    }
 
     @Test
     void updateOrder_shouldReturnUpdatedObject() throws Exception {
