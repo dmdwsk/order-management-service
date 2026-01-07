@@ -1,10 +1,17 @@
 package com.codedmdwsk.ordermanagementservice.exceptions;
 
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.exc.StreamReadException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.ErrorResponse;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -79,5 +86,63 @@ public class GlobalExceptionHandler {
         pd.setProperty("path", request.getRequestURI());
         return pd;
     }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ProblemDetail handleNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        log.warn("Malformed JSON at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Malformed request body (invalid JSON or field format)"
+        );
+        pd.setTitle("Bad Request");
+        pd.setType(URI.create("https://example.com/problems/bad-request"));
+        pd.setProperty("path", request.getRequestURI());
+        return pd;
+    }
+
+
+    @ExceptionHandler(StreamReadException.class)
+    public ProblemDetail handleStreamRead(StreamReadException ex, HttpServletRequest request) {
+        log.warn("Bad JSON file at {}: {}", request.getRequestURI(), ex.getOriginalMessage());
+
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Malformed JSON file"
+        );
+        pd.setTitle("Bad Request");
+        pd.setType(URI.create("https://example.com/problems/bad-request"));
+        pd.setProperty("path", request.getRequestURI());
+        return pd;
+    }
+
+
+    @ExceptionHandler(JsonProcessingException.class)
+    public ProblemDetail handleJsonProcessing(JsonProcessingException ex, HttpServletRequest request) {
+        log.warn("JSON processing error at {}: {}", request.getRequestURI(), ex.getOriginalMessage());
+
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Malformed JSON file"
+        );
+        pd.setTitle("Bad Request");
+        pd.setType(URI.create("https://example.com/problems/bad-request"));
+        pd.setProperty("path", request.getRequestURI());
+        return pd;
+    }
+
+    @ExceptionHandler(JacksonException.class)
+    public ProblemDetail handleJackson(JacksonException ex, HttpServletRequest request) {
+        log.warn("Bad JSON in {}: {}", request.getRequestURI(), ex.getOriginalMessage());
+
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Malformed JSON file"
+        );
+        pd.setTitle("Bad Request");
+        pd.setType(URI.create("https://example.com/problems/bad-request"));
+        pd.setProperty("path", request.getRequestURI());
+        return pd;
+    }
+
 
 }

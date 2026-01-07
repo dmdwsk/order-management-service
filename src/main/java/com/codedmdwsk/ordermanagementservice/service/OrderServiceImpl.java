@@ -102,10 +102,10 @@ public class OrderServiceImpl implements OrderService{
                 dto.getProducts()
         );
         OrderData order = orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() -> new NotFoundException("Order not found"));
 
         Customer customer = customerRepository.findById(dto.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+                .orElseThrow(() -> new NotFoundException("Customer not found"));
 
         order.setCustomer(customer);
         order.setDate(dto.getDate());

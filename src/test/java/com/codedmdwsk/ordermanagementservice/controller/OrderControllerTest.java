@@ -173,18 +173,33 @@ class OrderControllerTest {
 
         OrderUpdateDto dto = OrderUpdateDto.builder()
                 .customerId(customer2.getId())
-                .date(LocalDate.now().minusDays(1))
-                .totalPrice(BigDecimal.valueOf(99))
+                .date(LocalDate.now().minusYears(1))
+                .totalPrice(BigDecimal.valueOf(-1))
                 .products("Q,W,E")
                 .build();
 
         mockMvc.perform(put("/api/orders/" + order.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalPrice").value(99));
+                .andExpect(status().isBadRequest());
     }
+    @Test
+    void updateOrder_shouldReturn404_whenOrderNotFound() throws Exception {
+        var customer = createCustomer("C1");
 
+        OrderUpdateDto dto = OrderUpdateDto.builder()
+                .customerId(customer.getId())
+                .date(LocalDate.now().minusDays(1))
+                .totalPrice(BigDecimal.valueOf(10))
+                .products("Q,W,E")
+                .build();
+        mockMvc.perform(put("/api/orders/999999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+                .andExpect(status().isNotFound());
+
+    }
     @Test
     void deleteOrder_shouldReturn204() throws Exception {
         var customer = createCustomer("Alice");
@@ -199,6 +214,25 @@ class OrderControllerTest {
         mockMvc.perform(delete("/api/orders/" + order.getId()))
                 .andExpect(status().isNoContent());
     }
+    @Test
+    void deleteOrder_shouldReturn404_whenOrderNotFound() throws Exception {
+        mockMvc.perform(delete("/api/orders/999999"))
+                .andExpect(status().isNotFound());
+    }
+//    @Test
+//    void uploadOrders_shouldReturn400_whenFileIsNotJson() throws Exception {
+//        MockMultipartFile file = new MockMultipartFile(
+//                "file",
+//                "orders.txt",
+//                "text/plain",
+//                "not a json".getBytes()
+//        );
+//
+//        mockMvc.perform(multipart("/api/orders/upload").file(file))
+//                .andExpect(status().isBadRequest());
+//    }
+
+
 
     @Test
     void listOrders_shouldReturnPagedData() throws Exception {
